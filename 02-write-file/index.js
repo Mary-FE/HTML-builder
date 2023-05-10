@@ -1,22 +1,27 @@
 const fs = require('fs');
+const path = require('path');
+const file = path.join(__dirname, 'text.txt');
+const { stdout } = require('process');
 const readline = require('readline').createInterface({
     input: process.stdin,
     output: process.stdout
 });
 
-let prompt = function() {
-    let messageToInput =    "\nType your text here:\n" +
-                            "Press [Enter] for SAVE | Ctrl + C or type 'exit' for stop writing\n" +
-                            "==============================================\n\n";
-    let messageAfterSave =  "\n==============================================\n" +
-                            "-- Your was saved! Write more or finish work. --";
+let messageToInput =    "\nType your text here:\n" +
+                        "Press [Enter] for SAVE | Ctrl + C or type 'exit' for stop writing\n" +
+                        "==============================================\n";
 
-    readline.question(messageToInput, text => {
-        console.log(messageAfterSave);
-        if (text === 'exit') return readline.close();
-        fs.appendFile('./02-write-file/text.txt', text, (err) => { if (err) throw err; } );
-        prompt();
-    });
-}
+let messageAfterSave =  "\n==============================================\n" +
+                        "-- Printing is stopped. The file has been update successfully! --\n";
 
-prompt();
+// Start typing
+console.log(messageToInput);
+
+readline.on('line', (text) => {
+    text === 'exit' 
+        ? process.exit(0)
+        : fs.appendFile(file, `${text}\n`, () => {});
+});
+
+process.on('exit', () => stdout.write(messageAfterSave));
+process.on('SIGINT', () => stdout.write(messageAfterSave));

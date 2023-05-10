@@ -1,9 +1,19 @@
-const fs = require('fs');
+const fs = require('fs'),
+      path = require('path');
 
-function copyDir(path, dest) {
-    fs.rm(dest, { recursive: true}, (err) => {
-        fs.cp(path, dest, {recursive: true}, (err) => {});
+function copyDir(folder, copy) {
+    let from = path.join(__dirname, folder),
+        to = path.join(__dirname, copy);
+
+    fs.rm(to, { recursive: true}, (e) => {
+        fs.mkdir(to, { recursive: true }, (e) => {
+            fs.readdir(from, (e, files) => {
+                files.forEach(file => { 
+                    fs.copyFile(`${from}/${file}`, `${to}/${file}`, (e) => {});
+                });
+            });
+        });
     }); 
 }
 
-copyDir('./04-copy-directory/files', './04-copy-directory/files-copy');
+copyDir('files', 'files-copy');
