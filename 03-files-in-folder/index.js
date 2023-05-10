@@ -1,11 +1,15 @@
-const fs = require('fs');
+const fs = require('fs'),
+      path = require('path');
 
-fs.readdir('./03-files-in-folder/secret-folder', (err, files) => {
+let secretPath = path.join(__dirname, 'secret-folder');
+
+fs.readdir(secretPath, {withFileTypes: true}, (err, files) => {
     files.forEach(file => { 
-        fs.stat(`./03-files-in-folder/secret-folder/${file}`, (err, stats) => {
-            let [name, ext] = file.split('.');
-
-            if (stats.size) console.log(`${name} - ${ext} - ${(stats.size / 1024).toFixed(2)}kb`);
+        fs.stat(`${secretPath}/${file.name}`, (err, stats) => {
+            if (file.isFile()) {
+                let [name, ext] = file.name.split('.');
+                console.log(`${name} - ${ext} - ${(stats.size / 1024).toFixed(2)}kb`);
+            } 
         });
     });
 });
