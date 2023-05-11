@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const file = path.join(__dirname, 'text.txt');
+const streem = fs.createWriteStream(file, { flags: 'a' });
 const { stdout } = require('process');
 const readline = require('readline').createInterface({
     input: process.stdin,
@@ -13,6 +14,14 @@ let messageToInput =    "\nType your text here:\n" +
 
 let messageAfterSave =  "\n==============================================\n" +
                         "-- Printing is stopped. The file has been update successfully! --\n";
+
+// Create file if not exist
+fs.access(file, (e) => {
+    if (e) {
+        streem.end();
+        console.log(`File text.txt was created\n`);
+    }
+});
 
 // Start typing
 console.log(messageToInput);
