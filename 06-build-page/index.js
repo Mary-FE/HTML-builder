@@ -1,6 +1,9 @@
 const fs = require('fs'),
       path = require('path');
 
+// 0 - Check system slash
+const S = path.join(__dirname).includes('/') ? '/' : '\\';
+
 // 1 - Create build folder and copy assets files
 function copyFolder(from, to, deep = false) {
     let dist = path.join(__dirname, to),
@@ -12,12 +15,13 @@ function copyFolder(from, to, deep = false) {
 
             // Read files & folders
             fs.readdir(folder, {withFileTypes: true}, (e, files) => {
+                // console.log(files);
                 files.forEach(file => {
                     if (!file.isFile()) {
-                        fs.mkdir(`${dist}\\${from}\\${file.name}`, { recursive: true }, (e) => {});
-                        copyFolder(`${from}\\${file.name}`, `${to}\\${from}\\${file.name}`, true);
+                        fs.mkdir(`${dist}${S}${from}${S}${file.name}`, { recursive: true }, (e) => {});
+                        copyFolder(`${from}${S}${file.name}`, `${to}${S}${from}${S}${file.name}`, true);
                     } else {
-                        fs.copyFile(`${folder}\\${file.name}`, `${dist}\\${file.name}`, (e) => {});
+                        fs.copyFile(`${folder}${S}${file.name}`, `${dist}${S}${file.name}`, (e) => {});
                     }
                 });
             });
@@ -26,8 +30,8 @@ function copyFolder(from, to, deep = false) {
 
     // Need only when build folder was created
     if (!deep) {
-        mergeCSS('styles', 'project-dist/style.css');
-        mergeHTML('template.html', 'components', 'project-dist/index.html');
+        mergeCSS('styles', `project-dist${S}style.css`);
+        mergeHTML('template.html', 'components', `project-dist${S}index.html`);
     }
 }
 
@@ -42,7 +46,7 @@ function mergeCSS(from, to) {
             let [name, ext] = file.split('.');
     
             if (ext === 'css') {
-                fs.readFile(`${styles}\\${file}`, 'utf-8', (e, text) => {
+                fs.readFile(`${styles}${S}${file}`, 'utf-8', (e, text) => {
                     fs.appendFile(dist, text + '\n', () => {} );
                 });
             }
@@ -61,7 +65,7 @@ function mergeHTML(tmp, from, to) {
     
         components.forEach((block, index) => {
             let file = block.match(/\w+/g)[0],
-                pathComponent = path.join(__dirname, `${from}/${file}.html`);
+                pathComponent = path.join(__dirname, `${from}${S}${file}.html`);
     
             fs.readFile(pathComponent, 'utf-8', (e, text) => {
                 html = html.replace(block, text);
